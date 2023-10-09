@@ -2,6 +2,7 @@ import os
 from flask import Flask, request
 from lib.database_connection import get_flask_database_connection
 from lib.album_repository import *
+from lib.artist_repository import *
 
 # Create a new Flask app
 app = Flask(__name__)
@@ -33,7 +34,27 @@ def create_new_album():
     artist_id = int(request.form['artist_id'])
 
     repo.create(title, release_year, artist_id)
-    return '200'
+    return ''
+
+@app.route('/artists', methods=['GET'])
+def get_all_artist_names():
+    conn = get_flask_database_connection(app)
+    repo = ArtistRepository(conn)
+
+    artists = repo.all()
+
+    return ', '.join([artist.name for artist in artists])
+
+@app.route('/artists', methods=['POST'])
+def create_artist():
+    conn = get_flask_database_connection(app)
+    repo = ArtistRepository(conn)
+
+    name = request.form['name']
+    genre = request.form['genre']
+
+    repo.create(name, genre)
+    return ''
 
 
 # These lines start the server if you run this file directly
